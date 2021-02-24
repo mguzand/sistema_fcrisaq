@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
 
 require '../funcs/conexion.php';
 require '../funcs/funcs.php';
@@ -43,10 +45,18 @@ $res_per = $permisos->fetch_assoc();
           </thead>
           <tbody>
     <?php 
-				
-         $sql = " SELECT * from tbl_producto";
+        $qa = '';
+				if (isset($_GET['desde'])) {
+           $dtainit = ($_GET['desde']=='') ?  '1990-12-20' : $_GET['desde'];
+           $hasta = ($_GET['hasta']=='') ?  date('Y-m-d') : $_GET['hasta'];
+           $qa = " WHERE (fecha_creacion BETWEEN '".$dtainit."' AND '".$hasta."')";
+        }
+        $sql = " SELECT * from tbl_producto ".$qa." ";
+      
+
+
   			$query = mysqli_query($mysqli, $sql);
-  			$count_query   = mysqli_query($mysqli, "SELECT count(*) AS numrows FROM tbl_producto ");
+  			$count_query   = mysqli_query($mysqli, "SELECT count(*) AS numrows FROM tbl_producto ".$qa." ");
   		  $row1= mysqli_fetch_array($count_query);
   			
   			$numrows = $row1['numrows'];

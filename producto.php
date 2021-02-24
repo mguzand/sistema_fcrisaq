@@ -115,7 +115,9 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 				<center>
 			      <i class='glyphicon glyphicon-share'  title="salir de la consulta" onclick="load(1)"></i>
 
-				  <input type="date" id="bd-desde"  /><input type="date" id="bd-hasta"  /><a onclick="reportePDF();" class="btn btn-danger">Consulta a PDF</a>
+				  <input type="date" id="bd-desde"  />
+				  <input type="date" id="bd-hasta"  />
+				  <a onclick="reportePDF();" class="btn btn-danger">Consulta a PDF</a>
 				</center>
 			</form>
 			
@@ -229,8 +231,29 @@ $( "#editar_usuario" ).submit(function( event ) {
 
 	$( "#guardar_parametro" ).submit(function( event ) {
   $('#guardar_datos').attr("disabled", true);
-  
+
+
+
+ if ($('#min').val()<=499 || $('#min').val()>=1000  || $('#max').val() > 1000 || $('#max').val() <  $('#min').val() ) {
+ 	$("#resultados_ajax").html(` 
+  			<div class="alert alert-danger" role="alert">
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+					<strong>Error!</strong> 
+					Validacion error 
+				</div>
+			`);
+ 	$('#guardar_datos').attr("disabled", false);
+ 	event.preventDefault();
+ 	return;
+ }
+
+
+ 
+
  var parametros = $(this).serialize();
+
+
+ 		$("#resultados_ajax").fadeIn();
 	 $.ajax({
 			type: "POST",
 			url: "ajax/nuevo_producto.php",
@@ -242,21 +265,56 @@ $( "#editar_usuario" ).submit(function( event ) {
 			$("#resultados_ajax").html(datos);
 			$('#guardar_datos').attr("disabled", false);
 			$("#guardar_parametro")[0].reset();
+			setTimeout( () => {
+			        $("#resultados_ajax").fadeOut();
+			}, 3000);
+
 			load(1);
 		  }
 	});
   event.preventDefault();
 })
 	
-		   	$(document).ready(function(){
+		$(document).ready(function(){
+			var today = new Date();
+			var dd = today.getDate();
+			var mm = today.getMonth()+1; //January is 0!
+			var yyyy = today.getFullYear();
+			 if(dd<10){
+			        dd='0'+dd
+			    } 
+			    if(mm<10){
+			        mm='0'+mm
+			    } 
+
+			today = yyyy+'-'+mm+'-'+dd;
+			document.getElementById("bd-hasta").setAttribute("max", today);
+			document.getElementById("bd-desde").setAttribute("max", today);
+
+ 
+			today = new Date();
+			var day = today.getDate();
+			var month = today.getMonth() + 1;
+			var year = today.getFullYear();
+
+			if (month < 10) month = "0" + month;
+			if (day < 10) day = "0" + day;
+			var today = year + "-" + month + "-" + day;
+			$('#bd-hasta').val(today);
+			console.log(today)
 			load(1);
 		});
 
 		function load(page){
 		
 			$("#loader").fadeIn('slow');
+
+		  var desde = $('#bd-desde').val();
+		  var hasta = $('#bd-hasta').val();
+
+
 			$.ajax({
-				url:'ajax/buscar_productos.php',
+				url:'ajax/buscar_productos.php?desde='+desde+'&hasta='+hasta,
 				 beforeSend: function(objeto){
 				 $('#loader').html('<img src="./img/ajax-loader.gif"> Cargando...');
 			  },
@@ -286,37 +344,39 @@ $( "#editar_usuario" ).submit(function( event ) {
         
         
 $('#bd-desde').on('change', function(){
-		var desde = $('#bd-desde').val();
-		var hasta = $('#bd-hasta').val();
-		var url = 'ajax/buscar_producto_fecha.php';
-		$.ajax({
-		type:'POST',
-		url:url,
-		data:'desde='+desde+'&hasta='+hasta,
-		success: function(data){
-			$(".outer_div").html(data).fadeIn('slow');
-					$('#loader').html('');
-		}
-	});
-	return false;
+		// var desde = $('#bd-desde').val();
+		// var hasta = $('#bd-hasta').val();
+		// var url = 'ajax/buscar_producto_fecha.php';
+		// $.ajax({
+		// type:'POST',
+		// url:url,
+		// data:'desde='+desde+'&hasta='+hasta,
+		// success: function(data){
+		// 	$(".outer_div").html(data).fadeIn('slow');
+		// 			$('#loader').html('');
+		// }
+	// });
+	// return false;
+	load(1)
 	});
 	
 	  
 	  
 	  $('#bd-hasta').on('change', function(){
-		var desde = $('#bd-desde').val();
-		var hasta = $('#bd-hasta').val();
-		var url = 'ajax/buscar_producto_fecha.php';
-		$.ajax({
-		type:'POST',
-		url:url,
-		data:'desde='+desde+'&hasta='+hasta,
-		success: function(data){
-			$(".outer_div").html(data).fadeIn('slow');
-					$('#loader').html('');
-		}
-	});
-	return false;
+		// var desde = $('#bd-desde').val();
+		// var hasta = $('#bd-hasta').val();
+		// var url = 'ajax/buscar_producto_fecha.php';
+		// $.ajax({
+		// type:'POST',
+		// url:url,
+		// data:'desde='+desde+'&hasta='+hasta,
+		// success: function(data){
+		// 	$(".outer_div").html(data).fadeIn('slow');
+		// 			$('#loader').html('');
+		// }
+	// });
+	// return false;
+	load(1)
 	});
 	
 	
@@ -327,6 +387,7 @@ $('#bd-desde').on('change', function(){
 //	window.open('reporte/reproducto.php?filtro='+filtro);
 //}
 function reportePDF(){
+
 	var desde = $('#bd-desde').val();
 	var hasta = $('#bd-hasta').val();
 	window.open('reporte/reproducto.php?desde='+desde+'&hasta='+hasta);

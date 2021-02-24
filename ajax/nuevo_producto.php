@@ -2,6 +2,7 @@
   <?php
 
 session_start();
+date_default_timezone_set("America/Tegucigalpa");
 
 
 if(($_SESSION['id_usuario'])){
@@ -56,9 +57,11 @@ $row = $result->fetch_assoc();
 	
 					//$usuario='ADMINISTRADOR';
 					$NOW='NOW()';
+		$date = date('Y-m-d H:i:s');			
 		$sql="INSERT INTO tbl_producto
         (nombre,precio,maximo, minimo,Creado_por,fecha_creacion) 
-        VALUES ('$producto','$precio','$maximo','$minimo','$usuario',now());";
+        VALUES ('$producto','$precio','$maximo','$minimo','$usuario','$date');";
+
 		$query_new_insert = mysqli_query($con,$sql);
 			if ($query_new_insert){
 				$sql="select * from tbl_producto where nombre = '".$producto."';";
@@ -66,8 +69,8 @@ $row = $result->fetch_assoc();
 				$row = mysqli_fetch_array($query);
 				$idpr=$row['id_producto'];
                 $sql="INSERT INTO tbl_inventario(nombre_equipo,id_producto, precio,cantidad,
-				fecha_creacion, Creado_por) 
-			   VALUES ('$producto',$idpr,$precio,0,now(),'$usuario');";
+				fecha_creacion, Creado_por, modificado_por) 
+			   VALUES ('$producto',$idpr,$precio,0,now(),'$usuario', '$usuario');";
 			   //var_dump($idpr);
 				$query_new_insert = mysqli_query($con,$sql);
 
@@ -76,7 +79,7 @@ $row = $result->fetch_assoc();
 				
 				
 			} else{
-				$errors []= "Lo siento algo ha salido mal intenta nuevamente.".mysqli_error($con);
+				$errors []= "Lo siento algo ha salido mal intenta nuevamente....".mysqli_error($con);
 			
 		}
 		
