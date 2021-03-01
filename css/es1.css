@@ -1,3 +1,14 @@
+.inner ul li {
+    background: white !important;
+    color: aliceblue !important;
+}
+
+
+.inner ul li a {
+    color: #494949 !important;
+}
+
+
 .con {
     margin-left: auto;
     margin-right: auto;

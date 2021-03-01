@@ -58,6 +58,10 @@ echo $insertar;
 <link href='//fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
 <link href="//fonts.googleapis.com/css?family=Raleway:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
 <link href='//fonts.googleapis.com/css?family=Roboto+Condensed:400,700italic,700,400italic,300italic,300' rel='stylesheet' type='text/css'>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
+
+
 <!-- //font -->
 <script src="js/jquery-1.11.1.min.js"></script>
 <script src="js/bootstrap.js"></script>
@@ -170,6 +174,8 @@ echo $insertar;
 	<script src="js/SmoothScroll.min.js"></script>
 <script type="text/javascript" src="js/move-top.js"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
+
 	<!-- here stars scrolling icon -->
 	
 <!-- //here ends scrolling icon -->
@@ -179,7 +185,30 @@ echo $insertar;
 
 
     <script>
-        
+
+
+function saveKardex(){
+	var form_data = new FormData();
+	form_data.append('data', JSON.stringify(arreglo));
+	fetch('ajax/nuevo_kardex.php', {
+               method: 'POST',
+               body: form_data
+    })
+    .then((resp) => resp.json())
+    .then(texto=>{
+    	if (texto.status == 1) {
+    		location.reload();
+    	}
+    }) 
+    .catch(err=>{ console.log(err); });
+
+
+}
+
+
+
+
+       
         
 $( "#editar_password" ).submit(function( event ) {
   $('#actualizar_datos3').attr("disabled", true);

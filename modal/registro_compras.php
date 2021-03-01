@@ -1,4 +1,5 @@
-  
+
+
 	<!-- Modal -->
 	<div class="modal fade" id="myModalpara" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 	  <div class="modal-dialog" role="document">
@@ -13,7 +14,7 @@
 			  <div class="form-group">
 				<label for="rol" class="col-sm-3 control-label">Producto</label>
 				<div class="col-sm-8">
-				  <select title="sistema" class='form-control' name="pd" id='pd'  style="text-transform: uppercase;" >
+				  <select onchange="datosprecio(this)" title="sistema"  class='form-control selectpicker ' data-live-search="true"   name="pd" id='pd'  style="text-transform: uppercase;" >
 			        <option value="">- Seleccione un Producto -</option>
 
 			        <?php 
@@ -37,6 +38,9 @@
  </script>
 			  
 			  <script>
+
+
+	let precio;
     function solonumeros(e){
        key = e.keyCode || e.which;
        tecla = String.fromCharCode(key).toLowerCase();
@@ -54,19 +58,47 @@
             return false;
         }
     }
+
+
+    const datosprecio = () => {
+
+    	fetch(`ajax/buscar-precio.php?id_producto=${ $('#pd').val() }`)
+    	     .then((resp) => resp.json())
+    	     .then(dataserver=>{
+    	     	precio= dataserver.precio;
+    	     })
+    	     .catch(err => {
+    	     	console.log(err);
+    	     })
+    }
+
+    const resulprecio = () => {
+    	let cantidad = $('#ct').val();
+    	if (precio !==undefined && cantidad !=='' )    {
+    		let resul = (parseInt(cantidad))*(parseInt(precio));
+    		$('#precio').val(resul);
+    	}else{
+    		$('#precio').val('');
+    	}
+    }
+
+
+
+
+
 </script>
 			
               <div class="form-group">
 				<label for="rol" class="col-sm-3 control-label">Cantidad</label>
 				<div class="col-sm-8">
-				  <input type="text" class="form-control" id="ct" name="ct" placeholder="Ingrese Cantidad Producto" style="text-transform: uppercase;" onkeypress="return solonumeros(event)"  maxlength="6"  onPaste="return false;" onkeyup="return unespacio58()" required>
+				  <input type="text" class="form-control" id="ct" name="ct" placeholder="Ingrese Cantidad Producto" style="text-transform: uppercase;" onkeypress="return solonumeros(event)" onkeyup="resulprecio()"  maxlength="6"  onPaste="return false;" onkeyup="return unespacio58()" required>
 				</div>
 			  </div>
 
 			  <div class="form-group">
 				<label for="rol" class="col-sm-3 control-label">Precio</label>
 				<div class="col-sm-8">
-				  <input type="text" class="form-control" id="precio" name="precio" placeholder="Precio Producto" style="text-transform: uppercase;" onkeypress="return llenado(a) "  maxlength="10"  onPaste="return false;" onkeyup="return unespacio58()" required>
+				  <input type="text" class="form-control" id="precio" readonly="true" name="precio" placeholder="Precio Producto" style="text-transform: uppercase;" onkeypress="return llenado(a) "  maxlength="10"  onPaste="return false;" onkeyup="return unespacio58()" required>
 				</div>
 			  </div>
 

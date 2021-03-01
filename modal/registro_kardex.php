@@ -13,7 +13,7 @@
 			  <div class="form-group">
 			  <label for="descrepcion" class="col-sm-3 control-label">Producto</label>
 				<div class="col-sm-8">
-                    <select title="sistema" class='form-control' name="producto" id='producto'  style="text-transform: uppercase;" >
+                    <select title="sistema"  class='form-control selectpicker ' data-live-search="true"  name="producto" id='producto'  style="text-transform: uppercase;" >
 			        <option value="">- Seleccione un Producto -</option>
 
 			        <?php 
@@ -21,7 +21,7 @@
 			        while($rw=mysqli_fetch_array($query_cod_veh)) {
 			          ?>
 
-			        <option value="<?php echo $rw['Id_equipo'];?>"><?php echo $rw['nombre_equipo'].' - Disponible='.$rw['cantidad'];?></option>     
+			        <option data-name="<?php echo $rw['nombre_equipo'].' - Disponible='.$rw['cantidad'];?>" value="<?php echo $rw['Id_equipo'];?>"><?php echo $rw['nombre_equipo'].' - Disponible='.$rw['cantidad'];?></option>     
 			          <?php
 			        }
 
@@ -117,8 +117,20 @@ function unosolo() {
 			  </div>  ---->
 
 
-
-
+<div style=" text-align: right; margin-right: 30px; ">
+	<button onclick="agregarAlArreglo(this)"  type="button" class="btn btn-secondary">Agregar</button>
+</div>
+<table class="table">
+	<tr>
+		<td>ID</td>
+		<td>Producto</td>
+		<td>Cantidad</td>
+		<td>Transacción</td>
+	</tr>
+	<tbody id="result">
+		
+	</tbody>
+</table>
 
    
 		  </div>
@@ -130,6 +142,44 @@ function unosolo() {
 		document.guardar_parametro.descripcion.value=nuev;
 		if(nuev=orig.split(' ').length>=2);
 	}
+
+
+let arreglo = [];
+function agregarAlArreglo(){
+   arreglo.push({
+   	  producto: $('#producto').val(),
+   	  productoname: $('#producto>option:selected').data("name"),
+   	  cantidad: $('#cant').val(),
+   	  transaccion: $('#tt').val(),
+   	  transaccionName: 'SALIDA',
+   });
+   construirtable();
+}
+
+
+
+function construirtable(){
+	let result = ''
+   for (var i = 0; i < arreglo.length; i++) {
+   	 result+=`<tr>
+				<td>${i+1}</td>
+				<td>${ arreglo[i].productoname }</td>
+				<td>${ arreglo[i].cantidad }</td>
+				<td>SALIDA</td>
+				<td><span style=" cursor: pointer; background: red; " onclick=Eliminar(${i}) class="badge bg-danger">Eliminar</span></td>
+			</tr>`;
+   }
+
+   $('#result').html(result);
+}
+
+
+function Eliminar(parameter){
+	arreglo.splice(parameter,1);
+	construirtable();
+
+}
+
 
 	
 function unosolo() {
@@ -162,7 +212,7 @@ function unosolo() {
 
 		  <div class="modal-footer">
 			<button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-			<button type="submit" class="btn btn-warning" id="guardar_datos">Guardar Datos</button>
+			<button onclick="saveKardex()" type="button" class="btn btn-warning" id="guardar_datos">Guardar Datos</button>
 		  </div>
 		  </form>
 		</div>
