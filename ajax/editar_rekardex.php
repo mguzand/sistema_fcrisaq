@@ -1,127 +1,119 @@
-<?php
+<?php 
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
+date_default_timezone_set("America/Tegucigalpa"); 
 
-session_start();
+		require '../config/conexion_PDO.php';
 
-if(($_SESSION['id_usuario'])){
-require '../funcs/conexion.php';
-require '../funcs/funcs.php';
-$idUsuario = $_SESSION['id_usuario'];
-$sql = "Select id_usuario, nombre_usuario from tbl_usuario WHERE id_usuario = '".$idUsuario."'";
-$result = $mysqli->query($sql);
-$row = $result->fetch_assoc();
-	 
-}else{
-	  header ("Location: index.php");
-}
-
-?>
-<?php
-	//Archivo verifica que el usario que intenta acceder a la URL esta logueado
-	/*Inicia validacion del lado del servidor*/
-	//var_dump($_POST);
-	if (empty($_POST['prd'])) {
-           $errors[] = "Producto vacio";
-        }else if (empty($_POST['cant'])) {
-           $errors[] = "Cantidad Vacio";
-        }else if (empty($_POST['tp'])) {
-           $errors[] = "Tipo Transaccion Vacia";
-        }else if (
-			!empty($_POST['prd']) &&
-			!empty($_POST['cant'])&&
-			!empty($_POST['tp'])
-		){
-		/* Connect To Database*/
-		//Contiene funcion que conecta a la base de datos
-		// escaping, additionally removing everything that could be (html/javascript-) code
-		$id=$_POST["mod"];
-		$producto=mysqli_real_escape_string($mysqli,(strip_tags($_POST["prd"],ENT_QUOTES)));
-		$existencia=mysqli_real_escape_string($mysqli,(strip_tags($_POST["cant"],ENT_QUOTES)));
-		$transaccion=mysqli_real_escape_string($mysqli,(strip_tags($_POST["tp"],ENT_QUOTES)));
-		
-		
-			 
-			    $producto= strtoupper($producto);
-				$transaccion= strtoupper($transaccion);
-			
-
-		 
-			  $objeto="PANTALLA SALIDA KARDEX";
-                     $us="probando";
-					$accion="UPDATE";
-					$cant_up=0;
-					$usuario='ADMMINISTRADOR';
-         
-       // var_dump($id);
-		$sql="SELECT * FROM tbl_tipo_kardex WHERE Id_Kardex='".$producto."';";
-		$query_update = mysqli_query($mysqli,$sql);
-	
-
-		 $cant_eq = $row['cantidad'];
-		 $cant_up = $cant_eq-$existencia;
-	//	if($transaccion=='ENTRADA'){
-	//		$cant_up = $cant_eq + $existencia;
-	//		$sql="UPDATE tbl_inventario SET nombre_equipo='".$producto."',
-	//		 cantidad=$cant_up ,fecha_modificacion = now()
-	//		WHERE  Id_equipo='".$producto."'";
-	//	   $query_update = mysqli_query($mysqli,$sql);
-		
-		
-			if ($cant_eq>=$existencia) {
-				//$cant_up = $cant_eq-$existencia;
-				$sql="UPDATE tbl_inventario SET nombre_equipo='".$equip."', cantidad=$cant_up
-			   ,fecha_modificacion = now()
-				WHERE  Id_equipo='".$producto."'";
-			   $query_update = mysqli_query($mysqli,$sql);
-			
-			}else{
-				$query_update=false;				
-				$errors[]="La cantidad que solicita en inventario no existe";
-			}
-		         
-	
-   $id= 1; 
-                      
-			if ($query_update){
-				  $bita=grabarBitacora($idUsuario,$objeto,$accion,$sql);
-				  $mysqli->query("INSERT INTO tbl_inventario( Id_equipo,nombre_equipo,
-				  cantidad, fecha_operacion, fecha_creacion, creado_por) 
-				 VALUES ('$id','$nombre','$existencia',now(),now(),'$usuario');");	
-			 
-				$messages[] = "El Registro ha sido actualizado correctamente.";
-			} else{
-				$errors []= "Lo siento algo ha salido mal intente nuevamente.".mysqli_error($mysqli);
-			}
-		} else {
-			$errors []= "Error desconocido.";
+		//Archivo verifica que el usario que intenta acceder a la URL esta logueado
+		session_start();
+		if(isset($_SESSION['id_usuario']) && isset($_POST['prd'])  ){
+			$idUsuario = $_SESSION['id_usuario'];
+		}else{
+			 echo json_encode(array('ok' => false ));
+			 return;
 		}
-		
-		if (isset($errors)){
-			
-			?>
-			<div class="alert alert-danger" role="alert">
-				<button type="button" class="close" data-dismiss="alert">&times;</button>
-					<strong>Error!</strong> 
-					<?php
-						foreach ($errors as $error) {
-								echo $error;
-							}
-						?>
-			</div>
-			<?php
-			}
-			if (isset($messages)){
-				
-				?>
-				<div class="alert alert-success" role="alert">
-						<button type="button" class="close" data-dismiss="alert">&times;</button>
-						<strong>¡Bien hecho!</strong>
-						<?php
-							foreach ($messages as $message) {
-									echo $message;
-								}
-							?>
-				</div>
-				<?php
-			}
 
-?>
+		global $db;
+   		$db->beginTransaction();
+
+   		$objeto="PANTALLA SALIDA KARDEX";
+   		$accion="UPDATE";
+
+
+
+   		$producto = $_POST["mod"];
+		$p = array(':ID' => $producto );
+		$data = Seleccionar('SELECT * FROM tbl_inventario WHERE Id_equipo = :ID ',$p);
+		if (count($data)==0) {
+			echo json_encode(array('status' => 0, 'error'=> 'La cantidad solicitada no esta disponible'));
+            $db->rollBack();
+            return;
+		}
+
+		$cant_up =  intval($_POST["cant"]) + $data[0]['cantidad'];
+		$q="UPDATE tbl_inventario SET  cantidad = :C ,fecha_modificacion = now() WHERE  Id_equipo = :ID;";
+		$p = array(':ID' => $producto, 
+				   ':C' => $cant_up );
+		if (!Insertar($q,$p)) {
+            echo json_encode(array('ok' => true, 'status'=> 2, 'ID'=> $p ));
+            $db->rollBack();
+            return;
+        }
+
+
+        $q = "INSERT INTO tbl_tipo_kardex (tipo_movimiento,cantidad,fecha_operacion, Id_equipo) VALUES(:A, :B, :C, :D )"; 
+	    $p = array(':A' => 'ENTRADA', 
+	    		   ':B' => $_POST["cant"],
+	    		   ':C' => date('Y-m-d H:i:s'),
+	    		   ':D' => intval($producto) 
+	    		);
+
+	    if (!Insertar($q,$p)) {
+	            echo json_encode(array('ok' => true, 'status'=> 2, 'ID'=> 'INSERT INTO tbl_tipo_kardex' ));
+	            $db->rollBack();
+	            return;
+	    }
+
+
+	    $precio = $data[0]['cantidad']*$_POST["cant"];
+        $q="INSERT INTO tbl_libro_diario(id_cuenta_cargada,id_cuenta_debitada,monto_operacion, desglose_operacion, fecha_operacion) VALUES(:A,:B,:C,:D,:E)";
+		$p = array(':A' => 121,  ':B' => 141, ':C'=> $precio,  ':D'=> 'devolucion', ':E' => date('Y-m-d') );
+		if (!Insertar($q,$p)) {
+	          echo json_encode(array('ok' => true, 'status'=> 2, 'ID'=> 'INSERTs tbl_libro_diario',  'p'=> $p ));
+	          $db->rollBack();
+	          return;
+	    }
+
+	    grabarBitacora($idUsuario,$objeto,$accion,'Devolucion de kardex');
+
+	    $db->commit();
+		echo json_encode(array('status' => 1, 'ok'=> 'La devolucion ha sido ingresado satisfactoriamente.' ));
+
+
+
+		function Seleccionar($q, $parametros){
+		  global $db;
+		  $stmt = $db->prepare($q);
+		  $stmt->execute($parametros);
+		  return $stmt->fetchAll();
+		}
+
+
+		function grabarBitacora($id_usuario,$objeto,$accion,$descripcion){
+			global $db;
+			$q='INSERT INTO  tbl_bitacoras(id_usuario,objeto,accion,descripcion) VALUES(:A,:B,:C,:D)';
+			$p = array(':A' => $id_usuario,
+					   ':B' => $objeto,
+					   ':C' => $accion,
+					   ':D' => $descripcion );
+			Insertar($q,$p);
+
+			 
+		}
+
+		function Insertar($q, $parametros){
+		    global $db;
+		    $stmt = $db->prepare($q);
+		    return $stmt->execute($parametros ); //or die(print_r($stmt->errorInfo(), true));
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

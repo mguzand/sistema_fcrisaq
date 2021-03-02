@@ -1,7 +1,12 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
+$desde = $_GET['desde'];
+$hasta = $_GET['hasta'];
+
+
 if(strlen($_GET['desde'])>0 and strlen($_GET['hasta'])>0){
-	$desde = $_GET['desde'];
-	$hasta = $_GET['hasta'];
+	
 
 	$verDesde = date('Y-m-d', strtotime($desde));
 	$verHasta = date('Y-m-d', strtotime($hasta));
@@ -59,11 +64,24 @@ $pdf->Cell(25, 8, 'FECHA REG.', 1,0,'C');
 $pdf->Ln(8);
 $pdf->SetFont('Arial', '', 8);
 //CONSULTA
-$productos = mysqli_query($mysqli,"SELECT a.Id_Kardex, a.tipo_movimiento, 
-a.fecha_creacion, b.nombre_equipo ,a.cantidad
-FROM tbl_tipo_kardex as a
- inner join tbl_inventario as b on a.Id_equipo= b.Id_equipo 
- WHERE estado='AC' ORDER BY a.Id_Kardex ASC");
+$q = "SELECT a.Id_Kardex, a.tipo_movimiento, a.fecha_creacion, b.nombre_equipo ,a.cantidad FROM tbl_tipo_kardex as a inner join tbl_inventario as b on a.Id_equipo= b.Id_equipo WHERE estado='AC' ";
+
+if (isset($_GET['param']) ) {
+	 $q .= " AND nombre_equipo LIKE '%".$_GET['param']."%' ";
+}
+
+
+
+$q .= ' ORDER BY a.Id_Kardex ASC';
+
+
+
+
+
+ 
+
+
+$productos = mysqli_query($mysqli, $q);
 $item = 0;
 $totaluni = 0;
 $totaldis = 0;

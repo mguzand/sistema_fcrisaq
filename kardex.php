@@ -348,7 +348,8 @@ $('#bd-desde').on('change', function(){
 function reportePDF(){
 	var desde = $('#bd-desde').val();
 	var hasta = $('#bd-hasta').val();
-	window.open('reporte/rekardex.php?desde='+desde+'&hasta='+hasta);
+	var param = $('.input-sm')[1].value;
+	window.open('reporte/rekardex.php?desde='+desde+'&hasta='+hasta+'&param='+param);
 }
 
         

@@ -130,21 +130,10 @@ function unosolo() {
 
 </script>	     
 
-
-
-<div class="form-group">
-				<label for="descrepcion" class="col-sm-3 control-label">Codigo Padre</label>
-				<div class="col-sm-8">
-				<input type="text" class="form-control" id="cp" name="cp" placeholder="Ingrese codigo Cuenta Padre" style="text-transform: uppercase;" onkeypress="return solonumeros(event)"  maxlength="10"  onPaste="return false;" onkeyup="return unespacio58()" required>
-				</div>
-			  </div> 
-
-			  
-      
-              <div class="form-group">
+			<div class="form-group">
 				<label for="rol" class="col-sm-3 control-label">Cuenta Padre</label>
 				<div class="col-sm-8">
-				<select title="sistema" class='form-control' name="des" id="des"  style="text-transform: uppercase;" >
+				<select onchange="datapadre(this)" title="sistema" class='form-control' name="des" id="des"  style="text-transform: uppercase;" >
 			        <option value="">- Seleccione una Cuenta Padre -</option>
 					<option value="ACTIVO CORRIENTE">ACTIVO CORRIENTE</option>
 					<option value="ACTIVO NO CORRIENTE">ACTIVO NO CORRIENTE</option>
@@ -153,24 +142,45 @@ function unosolo() {
 					<option value="PATRIMONIO">PATRIMONIO</option>
 					<option value="INGRESO">INGRESO</option>
 					<option value="GGASTOS">GASTOS</option>
-
-	        <?php 
-			        
-			          ?>
-
-			           
-			          <?php
-			        
-
-			        ?>
 			        </select>
 				</div>
 			  </div> 
+
+
+
+<div class="form-group">
+				<label for="descrepcion" class="col-sm-3 control-label">Codigo Padre</label>
+				<div class="col-sm-8">
+				<input readonly type="text" class="form-control" id="cp" name="cp" placeholder="Ingrese codigo Cuenta Padre" style="text-transform: uppercase;" onkeypress="return solonumeros(event)"  maxlength="10"  onPaste="return false;" onkeyup="return unespacio58()" required>
+				</div>
+			  </div> 
+
+			  
+      
+              
 			  
 
 			
 
 			  <script>
+
+ 
+
+	const datapadre = () => {
+
+    	fetch(`ajax/buscar-precio.php?padre=${ $('#des').val() }`)
+    	     .then((resp) => resp.json())
+    	     .then(dataserver=>{
+    	     	$('#cp').val(dataserver.cuenta_padre);
+    	     })
+    	     .catch(err => {
+    	     	console.log(err);
+    	     })
+    }
+
+
+
+
     function soloLetras(e){
        key = e.keyCode || e.which;
        tecla = String.fromCharCode(key).toLowerCase();

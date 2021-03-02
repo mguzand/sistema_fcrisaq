@@ -1,16 +1,32 @@
 <?php 
 require '../funcs/conexion.php';
 
-
-$sql = ("SELECT precio FROM `tbl_producto` WHERE id_producto = ".$_GET['id_producto']." ");
-$query = mysqli_query($mysqli, $sql);
-
-
-$row= mysqli_fetch_array($query);
-$numrows = $row['precio'];
+if(isset($_GET['padre']) ){
+    $sql = "SELECT cuenta_padre FROM `tbl_catalogo_cuenta` WHERE descripcion = '".$_GET['padre']."' ";
+    $query = mysqli_query($mysqli, $sql);
 
 
-echo json_encode(array('precio' => $numrows ));
+    $row= mysqli_fetch_array($query);
+    $numrows = $row['cuenta_padre'];
+    
+    
+    echo json_encode(array('cuenta_padre' => $numrows ));
+
+
+
+}else{
+    $sql = ("SELECT precio FROM `tbl_producto` WHERE id_producto = ".$_GET['id_producto']." ");
+    $query = mysqli_query($mysqli, $sql);
+    
+    
+    $row= mysqli_fetch_array($query);
+    $numrows = $row['precio'];
+    
+    
+    echo json_encode(array('precio' => $numrows ));
+}
+
+
 
 
  

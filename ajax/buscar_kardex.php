@@ -59,6 +59,7 @@ $res_per = $permisos->fetch_assoc();
 			
         while ($row=mysqli_fetch_array($query)){ 
           $id=$row['Id_Kardex'];
+          $Id_equipo=$row['Id_equipo'];
           $equipo=$row['nombre_equipo'];
           $existencia=$row['cantidad'];
           $tipom=$row['tipo_movimiento'];
@@ -79,12 +80,12 @@ $res_per = $permisos->fetch_assoc();
                      <?php
 			if ($actualizar==1 || $rol ==15){?>  
                       
-                  <a href="#" class='btn btn-primary' title='Editar Salida Kardex'  data-toggle="modal" data-target="#myModal2" onclick='obtener_datos("<?php echo $id;?>","<?php echo $equipo;?>","<?php echo $existencia;?>","<?php echo $tipom;?>")'><i class="glyphicon glyphicon-edit"></i></a>
+                  <a href="#" class='btn btn-primary' title='Editar Salida Kardex'  data-toggle="modal" data-target="#myModal2" onclick='obtener_datos("<?php echo $Id_equipo;?>","<?php echo $equipo;?>","<?php echo $existencia;?>","<?php echo $tipom;?>")'><i class="glyphicon glyphicon-edit"></i></a>
                   <?php } 
                       
 			if ($eliminar==1 || $rol ==15){?>  
                       
-                  	 <a href="#" class='btn btn-danger' title='Cancelar Registro Kardex'  data-toggle="modal" data-target="#myModal4" onclick='capturar("<?php echo $id;?>" )' ><i class="glyphicon glyphicon-remove"></i></a> 
+                  	 <!-- <a href="#" class='btn btn-danger' title='Cancelar Registro Kardex'  data-toggle="modal" data-target="#myModal4" onclick='capturar("<?php echo $id;?>" )' ><i class="glyphicon glyphicon-remove"></i></a> --> 
                   
                <?php } ?>
                 </td>

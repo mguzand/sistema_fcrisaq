@@ -52,6 +52,20 @@ date_default_timezone_set("America/Tegucigalpa");
 		    }
 
 
+		    $q = "INSERT INTO tbl_tipo_kardex (tipo_movimiento,cantidad,fecha_operacion, Id_equipo) VALUES(:A, :B, :C, :D )"; 
+		    $p = array(':A' => 'SALIDA', 
+		    		   ':B' => $dataPOST[$i]['cantidad'],
+		    		   ':C' => date('Y-m-d H:i:s'),
+		    		   ':D' => intval($producto) 
+		    		);
+
+		    if (!Insertar($q,$p)) {
+		            echo json_encode(array('ok' => true, 'status'=> 2, 'ID'=> 'INSERTs tbl_inventario' ));
+		            $db->rollBack();
+		            return;
+		    }
+
+
 
 		    $q="INSERT INTO tbl_libro_diario(id_cuenta_cargada,id_cuenta_debitada,monto_operacion, desglose_operacion, fecha_operacion) VALUES(:A,:B,:C,:D,:E)";
    			$p = array(':A' => 141,  ':B' => 121, ':C'=> $precio,  ':D'=> 12323, ':E' => date('Y-m-d') );
