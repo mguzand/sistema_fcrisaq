@@ -24,6 +24,7 @@ if(isset($_GET['padre']) ){
     
     
     echo json_encode(array('precio' => $numrows ));
+    
 }
 
 
