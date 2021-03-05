@@ -264,12 +264,14 @@ $( "#editar_usuario" ).submit(function( event ) {
 		}
         
 
-		function obtener_datos(id,codigo,tipo,padre){ 				
+		function obtener_datos(id,codigo,tipo,padre,des){ 				
 			$("#mod").val(id);
 			$("#codigo").val(codigo);
 			$("#tipo").val(tipo);
 			$("#cpa").val(padre);	
-			$("#desc").val(des);	
+			$('#desc').val(des).change();
+
+
 				
 		}	 
            
